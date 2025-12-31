@@ -1,30 +1,54 @@
+# **Compte Rendu – Activité Pratique ORM, JPA et Spring Data**
 
-Introduction
+## **Introduction**
 
-Dans le cadre de ce projet, j’ai souhaité approfondir mes compétences en développement d’applications Java en utilisant le framework Spring Boot associé à JPA pour la gestion de données dans une base de données. L’objectif principal était de comprendre le fonctionnement de Spring Data et la manière dont il simplifie la persistance des données, tout en expérimentant avec différentes opérations CRUD et des requêtes personnalisées. Pour commencer, j’ai installé IntelliJ IDEA Ultimate et créé un projet via Spring Initializer en sélectionnant les dépendances essentielles pour ce type d’application : Spring Data JPA pour la persistance, H2 pour la base de données en mémoire, Spring Web pour exposer éventuellement des endpoints web et Lombok pour simplifier l’écriture du code grâce aux annotations générant automatiquement les getters, setters et constructeurs. L’idée était de mettre en place une application simple de gestion de produits afin de tester les principales fonctionnalités offertes par Spring Boot et JPA.
+Pour cette activité pratique dans le cadre du cours **Architecture JEE** à **Mundiapolis**, j’ai voulu me familiariser avec **Spring Boot**, **JPA**, **Hibernate** et **Spring Data JPA**.  
+L’objectif était de créer une application de gestion hospitalière capable de gérer les **patients**, les **médecins**, les **rendez-vous** et les **consultations**.  
 
-Développement / Plan
+Ce projet m’a permis de comprendre comment **l’injection de dépendances** fonctionne dans Spring et comment organiser un projet en couches propres : **entités**, **repositories**, **services** et **contrôleurs REST**.
 
-1. Création de l’entité Product
+---
 
-La première étape a été la définition de l’entité principale du projet Product. Cette classe contient quatre attributs principaux : id, name, price et quantity. L’attribut id est de type Long et est généré automatiquement par la base de données grâce à l’annotation GeneratedValue. L’attribut name correspond au nom du produit et est de type chaîne de caractères. Les attributs price et quantity sont respectivement de type double et int. Pour faciliter le développement et rendre le code plus lisible, j’ai utilisé les annotations JPA telles que Entity pour indiquer que cette classe est persistable, et Id pour identifier la clé primaire. De plus, Lombok a été utilisé pour générer automatiquement les getters, setters et constructeurs, évitant ainsi la répétition de code et accélérant le développement. Cette étape m’a permis de comprendre l’importance des annotations dans JPA et la manière dont elles simplifient la définition des entités.
+## **Mise en place du projet**
 
-2. Création du repository ProductRepository
+J’ai commencé par :  
 
-Une fois l’entité définie, j’ai créé l’interface ProductRepository qui étend JpaRepository<Product, Long>. Cette extension fournit automatiquement toutes les opérations CRUD classiques, telles que save, findAll, findById, deleteById, etc. Par la suite, j’ai ajouté des méthodes personnalisées pour répondre à des besoins spécifiques : rechercher des produits par nom (findByNameContains) ou par prix (findByPriceGreaterThan), et des requêtes plus flexibles avec l’annotation Query. Cette étape a été particulièrement intéressante car elle m’a montré à quel point Spring Data simplifie le développement : il suffit de définir l’interface avec les méthodes souhaitées et Spring génère automatiquement l’implémentation, éliminant ainsi la nécessité d’écrire des requêtes SQL manuelles pour la plupart des cas d’usage.
+* Installer **IntelliJ Ultimate**.  
+* Créer un projet Spring Boot via Spring Initializer avec les dépendances :
+  - **Spring Web**
+  - **Spring Data JPA**
+  - **H2 Database**
+  - **Lombok**
+* Créer les entités JPA suivantes :
+  - **Patient** : id, nom, date de naissance, malade, liste des rendez-vous
+  - **Medecin** : id, nom, email, spécialité, liste des rendez-vous
+  - **RendezVous** : id, date, status, patient, médecin, consultation
+  - **Consultation** : id, date de consultation, rapport, rendez-vous associé
+* Créer les repositories Spring Data JPA pour chaque entité.  
+* Créer le service **IHospitalService** et son implémentation **HospitalServiceImpl** pour gérer la logique métier via **injection de dépendances**.
 
-3. Test de l’application avec CommandLineRunner
+---
 
-Pour vérifier le fonctionnement du projet, j’ai utilisé la classe principale ProjetOrmApplication qui implémente CommandLineRunner. Dans la méthode run, j’ai d’abord ajouté quelques produits dans la base de données, puis j’ai testé différentes fonctionnalités : consultation de tous les produits existants, récupération d’un produit spécifique via son identifiant, exécution des différentes méthodes de recherche personnalisées. Cette phase m’a permis de m’assurer que toutes les méthodes du repository fonctionnaient correctement et que les requêtes personnalisées renvoyaient les résultats attendus. J’ai ainsi pu expérimenter directement avec les objets persistants et observer le comportement de JPA en action.
+## **Fonctionnement**
 
-4. Migration de H2 vers MySQL
+Au démarrage de l’application, le **CommandLineRunner** insère automatiquement :
 
-Après avoir testé l’application avec la base en mémoire H2, j’ai souhaité migrer vers MySQL afin d’évaluer la compatibilité de Spring Boot et JPA avec une base de données réelle. La migration a été relativement simple : il suffisait de modifier la configuration dans le fichier application.properties en indiquant l’URL de la base MySQL, ainsi que le nom d’utilisateur et le mot de passe. Cette opération a confirmé l’un des principaux avantages de Spring Boot et JPA : la persistance des données reste transparente et le code métier n’a pas besoin d’être modifié lors du changement de base de données. Cette flexibilité démontre la puissance de Spring pour gérer différents environnements de manière homogène.
+* Trois patients : Mohamed, Hassan et Najat  
+* Trois médecins : Aymane, Hanane et Yasmine  
+* Un rendez-vous entre le premier patient et Yasmine  
+* Une consultation associée à ce rendez-vous avec un rapport  
 
-5. Extension vers une application plus complexe
+Toutes les opérations CRUD peuvent être effectuées via le service ou les repositories directement. L’injection de dépendances permet de séparer la couche métier de la couche accès aux données. Un contrôleur REST expose la liste des patients via l’URL `/patients`.
 
-Enfin, pour approfondir mes connaissances, j’ai repris les exemples vus dans la vidéo sur la gestion d’une application complète incluant patients, médecins, rendez-vous, consultations, utilisateurs et rôles. J’ai appliqué la même logique que pour les produits : création des entités correspondantes, définition des repositories pour chaque entité et mise en place de tests dans la méthode run pour vérifier le bon fonctionnement de l’ensemble. Cette étape m’a permis de mieux comprendre la structure d’une application complète avec plusieurs entités et leurs relations, tout en bénéficiant de la simplicité de Spring Data pour gérer la persistance et les relations entre les objets.
+---
 
-Conclusion
+## **Résultats**
 
-Ce projet m’a permis de comprendre et d’appliquer concrètement les concepts de Spring Boot, JPA et Spring Data. J’ai appris à créer des entités persistables et les configurer correctement avec JPA, à définir des repositories pour gérer les opérations CRUD et ajouter des méthodes personnalisées pour des besoins spécifiques, à tester les fonctionnalités directement avec CommandLineRunner pour valider le comportement de l’application, à migrer facilement entre H2 et MySQL sans modifier le code métier, et à structurer une application plus complexe avec plusieurs entités liées tout en gardant le code simple et maintenable. Grâce à ce projet, j’ai acquis une base solide pour continuer à développer des applications Spring plus avancées, comprenant plusieurs entités, des relations complexes et des opérations persistantes fiables, tout en profitant de la simplicité et de la puissance offertes par Spring Boot et Spring Data.
+L’application fonctionne correctement, les entités sont persistées dans la base H2 au démarrage et peuvent être consultées via l’API REST.  
+Les relations entre les **patients**, **médecins**, **rendez-vous** et **consultations** sont correctement gérées grâce aux annotations JPA et à l’injection de dépendances.  
+
+---
+
+## **Capture d’écran**
+
+![Résultat](screenshots/1.png)
