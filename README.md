@@ -50,5 +50,6 @@ Les relations entre les **patients**, **médecins**, **rendez-vous** et **consul
 ---
 
 ## **Capture d’écran**
+![Résultat](screenshots/1.png)
 
 
